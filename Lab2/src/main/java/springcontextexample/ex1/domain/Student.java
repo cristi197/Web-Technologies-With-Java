@@ -4,7 +4,7 @@ public class Student {
 
     private String name;
     private String surname;
-    private String faculty;
+    private Faculty faculty;
     private int age;
 
     public Student() {
@@ -30,11 +30,11 @@ public class Student {
         this.surname = surname;
     }
 
-    public String getFaculty() {
+    public Faculty getFaculty() {
         return faculty;
     }
 
-    public void setFaculty(String faculty) {
+    public void setFaculty(Faculty faculty) {
         this.faculty = faculty;
     }
 
