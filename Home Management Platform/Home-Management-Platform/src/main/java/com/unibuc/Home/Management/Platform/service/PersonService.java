@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -15,20 +16,40 @@ public class PersonService {
     @Autowired
     private PersonRepository personRepository;
 
-    public Person save(PersonDto personDto)
-    {  Person person = mapToEntity(personDto);
-        return personRepository.save(person);
+    public PersonDto save(PersonDto personDto) {
+        Person person = mapToEntity(personDto);
+        Person savedPerson = personRepository.save(person);
+        return mapToDto(savedPerson);
     }
 
-    public List<PersonDto> getAll(){
+    public PersonDto update(PersonDto personDto) {
+        Person update = personRepository.update(mapToEntity((personDto)));
+        if (update != null) {
+            return mapToDto(update);
+        }
+        return null;
+    }
+
+    public List<PersonDto> getAll() {
         return personRepository.getAll()
                 .stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
 
-    public void delete (PersonDto person){
-        personRepository.delete(mapToEntity(person));
+    //    public void delete(PersonDto person) {
+//        personRepository.delete(mapToEntity(person));
+//    }
+    public boolean delete(String name) {
+        Optional<Person> optionalPerson = personRepository.getAll()
+                .stream()
+                .filter(person -> person.getFirstName().equals(name))
+                .findAny();
+        if (optionalPerson.isPresent()) {
+            personRepository.delete(optionalPerson.get());
+            return true;
+        }
+        return false;
     }
 
     private Person mapToEntity(PersonDto personDto) {
@@ -39,11 +60,10 @@ public class PersonService {
                 .build();
     }
 
-    private PersonDto mapToDto(Person person)
-    {
+    private PersonDto mapToDto(Person person) {
         return PersonDto.builder()
                 .firstName(person.getFirstName())
-                .lastName(person.getFirstName())
+                .lastName(person.getLastName())
                 .age(person.getAge())
                 .build();
 
