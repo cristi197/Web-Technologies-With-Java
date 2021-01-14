@@ -1,25 +1,35 @@
-package com.unibuc.Home.Management.Platform.domain;
-import lombok.*;
+package com.unibuc.Home.Management.Platform.dto;
 
+import com.unibuc.Home.Management.Platform.domain.Person;
+import com.unibuc.Home.Management.Platform.domain.Status;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.stereotype.Component;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.sql.Date;
 
-
-@Builder
-public class Task {
-    private long id;
+@Component
+public class TaskDto {
+    @NotNull
     private String name;
     private String description;
+    @NotNull
     private String priority;
+    @NotNull
     private Status status;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date startDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
+    @Min(value = 0, message = "Person id must be positive")
     private long personId;
 
-    public Task() {
+    public TaskDto() {
     }
 
-    public Task(long id, String name, String description, String priority, Status status, Date startDate, Date endDate, long personId) {
-        this.id = id;
+    public TaskDto(String name, String description, String priority, Status status, Date startDate, Date endDate, long personId) {
         this.name = name;
         this.description = description;
         this.priority = priority;
@@ -27,24 +37,6 @@ public class Task {
         this.startDate = startDate;
         this.endDate = endDate;
         this.personId = personId;
-    }
-
-    public Task(String name, String description, String priority, Status status, Date startDate, Date endDate, long personId) {
-        this.name = name;
-        this.description = description;
-        this.priority = priority;
-        this.status = status;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.personId = personId;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getName() {

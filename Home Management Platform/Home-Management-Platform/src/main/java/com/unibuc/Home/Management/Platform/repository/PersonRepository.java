@@ -1,22 +1,90 @@
 package com.unibuc.Home.Management.Platform.repository;
 
 import com.unibuc.Home.Management.Platform.domain.Person;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class PersonRepository {
 
-    private List<Person> persons = new ArrayList<>();
+    private JdbcTemplate jdbcTemplate;
 
-    public PersonRepository() {
-        loadData();
+    public PersonRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Person save(Person person) {
+    public Optional<Person> getById(Long id) {
+        String sql = "SELECT * FROM persons p WHERE p.id = ?";
+        RowMapper<Person> mapper = (resultSet, rowNum) -> {
+            return new Person(resultSet.getLong("id"),
+                    resultSet.getString("firstName"),
+                    resultSet.getString("lastName"),
+                    resultSet.getInt("age"));
+        };
+        Person person = jdbcTemplate.queryForObject(sql, mapper, id);
+        if (person != null)
+            return Optional.of(person);
+        return Optional.empty();
+    }
+
+    public List<Person> getAll() {
+        String sql = "select * from persons";
+        RowMapper<Person> rowMapper = (resultSet, rowNo) -> Person.builder()
+                .id(resultSet.getLong("id"))
+                .firstName(resultSet.getString("firstName"))
+                .lastName(resultSet.getString("lastName"))
+                .age(resultSet.getInt("age"))
+                .build();
+
+        return jdbcTemplate.query(sql, rowMapper);
+    }
+
+    public void updatePersonDetails(long id, int age) {
+        String sql = "update persons p set p.age = ? where p.id = ?";
+        int numberOfUpdatedPersonYear = jdbcTemplate.update(sql, age, id);
+        if (numberOfUpdatedPersonYear == 0) {
+            throw new RuntimeException();
+        }
+    }
+
+    public void deletePersonById(Long id){
+        String sql="delete from persons  where  id = ?";
+        jdbcTemplate.update(sql,id);
+    }
+
+    public Person createPerson(Person person) {
+        String sql = "insert into persons values (?,?,?,?)";
+        PreparedStatementCreator preparedStatementCreator = connection -> {
+            PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setObject(1, null);
+            preparedStatement.setString(2, person.getFirstName());
+            preparedStatement.setString(3, person.getLastName());
+            preparedStatement.setInt(4, person.getAge());
+
+            return preparedStatement;
+        };
+        GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(preparedStatementCreator, generatedKeyHolder);
+        generatedKeyHolder.getKey();
+        person.setId(generatedKeyHolder.getKey().longValue());
+        return person;
+/*        String sql="insert into bankaccounts values (?,?,?,?,?)";
+        jdbcTemplate.update(sql,null, bankAccount.getAccountNumber(),
+                bankAccount.getBalance(),bankAccount.getType().toString(),bankAccount.getCardNumber());*/
+    }
+    /*    public PersonRepository() {
+        loadData();
+    }*/
+
+/*    public Person save(Person person) {
         persons.add(person);
         return person;
     }
@@ -54,7 +122,7 @@ public class PersonRepository {
                 .age(14)
                 .build();
         persons.add(person2);
-    }
+    }*/
 
 
 }
