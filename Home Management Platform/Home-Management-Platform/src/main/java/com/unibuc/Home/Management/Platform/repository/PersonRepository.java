@@ -27,7 +27,8 @@ public class PersonRepository {
             return new Person(resultSet.getLong("id"),
                     resultSet.getString("firstName"),
                     resultSet.getString("lastName"),
-                    resultSet.getInt("age"));
+                    resultSet.getInt("age"),
+                    resultSet.getLong("roleId"));
         };
         Person person = jdbcTemplate.queryForObject(sql, mapper, id);
         if (person != null)
@@ -42,14 +43,15 @@ public class PersonRepository {
                 .firstName(resultSet.getString("firstName"))
                 .lastName(resultSet.getString("lastName"))
                 .age(resultSet.getInt("age"))
+                .roleId(resultSet.getLong("roleId"))
                 .build();
 
         return jdbcTemplate.query(sql, rowMapper);
     }
 
-    public void updatePersonDetails(long id, int age) {
-        String sql = "update persons p set p.age = ? where p.id = ?";
-        int numberOfUpdatedPersonYear = jdbcTemplate.update(sql, age, id);
+    public void updatePersonDetails(long id, int age, String firstName, String lastName) {
+        String sql = "update persons p set p.age = ?,p.firstName = ?, p.lastName = ? where p.id = ?";
+        int numberOfUpdatedPersonYear = jdbcTemplate.update(sql, age,firstName ,lastName , id);
         if (numberOfUpdatedPersonYear == 0) {
             throw new RuntimeException();
         }
@@ -61,13 +63,14 @@ public class PersonRepository {
     }
 
     public Person createPerson(Person person) {
-        String sql = "insert into persons values (?,?,?,?)";
+        String sql = "insert into persons values (?,?,?,?,?)";
         PreparedStatementCreator preparedStatementCreator = connection -> {
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setObject(1, null);
             preparedStatement.setString(2, person.getFirstName());
             preparedStatement.setString(3, person.getLastName());
             preparedStatement.setInt(4, person.getAge());
+            preparedStatement.setObject(5, person.getRoleId());
 
             return preparedStatement;
         };

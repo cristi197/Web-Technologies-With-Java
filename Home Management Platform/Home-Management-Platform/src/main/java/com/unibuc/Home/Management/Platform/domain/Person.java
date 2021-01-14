@@ -10,21 +10,24 @@ public class Person {
     private String firstName;
     private String lastName;
     private int age;
+    private long roleId;
 
     public Person() {
     }
 
-    public Person(long id, String firstName, String lastName, int age) {
+    public Person(long id, String firstName, String lastName, int age, long roleId) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;
+        this.roleId = roleId;
     }
 
-    public Person(String firstName, String lastName, int age) {
+    public Person(String firstName, String lastName, int age, long roleId) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;
+        this.roleId = roleId;
     }
 
     public long getId() {
@@ -57,5 +60,13 @@ public class Person {
 
     public void setAge(int age) {
         this.age = age;
+    }
+
+    public long getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(long roleId) {
+        this.roleId = roleId;
     }
 }

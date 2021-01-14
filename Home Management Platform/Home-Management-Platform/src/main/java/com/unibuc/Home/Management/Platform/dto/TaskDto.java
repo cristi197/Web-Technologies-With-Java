@@ -16,23 +16,24 @@ public class TaskDto {
     private String name;
     private String description;
     @NotNull
-    private String priority;
+    @Min(1)
+    private long priorityId;
     @NotNull
     private Status status;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date startDate;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
-    @Min(value = 0, message = "Person id must be positive")
+//    @Min(value = 0, message = "Person id must be positive")
     private long personId;
 
     public TaskDto() {
     }
 
-    public TaskDto(String name, String description, String priority, Status status, Date startDate, Date endDate, long personId) {
+    public TaskDto(String name, String description, long priorityId, Status status, Date startDate, Date endDate, long personId) {
         this.name = name;
         this.description = description;
-        this.priority = priority;
+        this.priorityId = priorityId;
         this.status = status;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -55,12 +56,12 @@ public class TaskDto {
         this.description = description;
     }
 
-    public String getPriority() {
-        return priority;
+    public long getPriorityId() {
+        return priorityId;
     }
 
-    public void setPriority(String priority) {
-        this.priority = priority;
+    public void setPriorityId(long priorityId) {
+        this.priorityId = priorityId;
     }
 
     public Status getStatus() {

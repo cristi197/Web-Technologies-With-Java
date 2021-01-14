@@ -5,6 +5,7 @@ import com.unibuc.Home.Management.Platform.dto.PersonDto;
 import com.unibuc.Home.Management.Platform.mapper.PersonMapper;
 import com.unibuc.Home.Management.Platform.service.PersonService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -23,6 +24,7 @@ public class PersonController {
         this.personMapper = personMapper;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public List<Person> getAll() {
         return personService.getAll();
@@ -33,6 +35,7 @@ public class PersonController {
         return personService.getById(id);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<Person> createBankAccount(
             @RequestBody Person person) {
@@ -44,11 +47,13 @@ public class PersonController {
     }
 
     @PutMapping
-    public void changeYear(
+    public void updatePersonDetails(
             @RequestBody
                     Person person) {
-        personService.changeYear(person);
+        personService.updatePersonDetails(person);
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public void deletePersonById(@PathVariable("id") Long id){
         personService.deletePersonById(id);

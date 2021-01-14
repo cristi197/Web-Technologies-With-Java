@@ -4,9 +4,11 @@ import com.unibuc.Home.Management.Platform.domain.Task;
 import com.unibuc.Home.Management.Platform.mapper.TaskMapper;
 import com.unibuc.Home.Management.Platform.service.TaskService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -30,13 +32,28 @@ public class TaskController {
         return taskService.getById(id);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getByName/{nameOfPerson}")
     public List<Task> getTaskByPersonName(@PathVariable String nameOfPerson) {
         return taskService.getTaskByPersonName(nameOfPerson);
     }
-    @GetMapping("/getFreeTasks")
-    public List<Task> getFreeTasks() {
-        return taskService.getFreeTasks();
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/getOwnTasks")
+    public List<Task> getOwnTasks(Principal principal){
+        return taskService.getOwnTasks(principal);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/getByTaskName/{nameOfTask}")
+    public List<Task> getByTaskName(@PathVariable String nameOfTask) {
+        return taskService.getByTaskName(nameOfTask);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/getEmptyTask")
+    public List<Task> getEmptyTask() {
+        return taskService.getEmptyTask();
     }
     @PostMapping
     public ResponseEntity<Task> createTask(
@@ -47,15 +64,21 @@ public class TaskController {
                 .created(URI.create("/bankAccount/" + createdTask.getId()))
                 .body(createdTask);
     }
+
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}/{personId}")
     public void changePersonId(@PathVariable("id") Long id,@PathVariable("personId") Long personId) {
         taskService.changePersonId(id, personId);
     }
+
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/changeTaskStatus/{taskId}/{status}/{personId}")
     public void changeTaskStatus(@PathVariable("taskId") Long taskId,@PathVariable("status") String status
             ,@PathVariable("personId") Long personId) {
         taskService.changeTaskStatus(taskId, status.toUpperCase(),personId);
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public void deleteTaskById(@PathVariable("id") Long id){
         taskService.deleteTaskById(id);

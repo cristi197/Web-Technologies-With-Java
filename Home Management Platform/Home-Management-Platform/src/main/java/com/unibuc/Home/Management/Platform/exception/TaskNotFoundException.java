@@ -7,4 +7,7 @@ public class TaskNotFoundException extends RuntimeException {
     public TaskNotFoundException(String status) {
         super("Status " + status + " doesn't exist ");
     }
+    public TaskNotFoundException() {
+        super("Task doesn't exist ");
+    }
 }

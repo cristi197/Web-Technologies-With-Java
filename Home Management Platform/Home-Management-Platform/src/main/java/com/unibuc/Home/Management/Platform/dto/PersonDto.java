@@ -14,17 +14,21 @@ public class PersonDto {
     private String firstName;
     @NotBlank(message = "Last name cannot be null")
     private String lastName;
-    @NotNull
+   // @NotNull
     @Min(value = 3, message = "To use the application you must be at least 5 years old")
     private int age;
+    @NotNull(message = "roleId cannot be null")
+    @Min(value = 1,message = "roleId must be positive")
+    private long roleId;
 
     public PersonDto() {
     }
 
-    public PersonDto(String firstName, String lastName, int age) {
+    public PersonDto(String firstName, String lastName, int age, long roleId) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;
+        this.roleId = roleId;
     }
 
     public String getFirstName() {
@@ -49,5 +53,13 @@ public class PersonDto {
 
     public void setAge(int age) {
         this.age = age;
+    }
+
+    public long getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(long roleId) {
+        this.roleId = roleId;
     }
 }

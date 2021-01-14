@@ -3,23 +3,38 @@ package com.unibuc.Home.Management.Platform.repository;
 import com.unibuc.Home.Management.Platform.domain.Person;
 import com.unibuc.Home.Management.Platform.domain.Task;
 import com.unibuc.Home.Management.Platform.domain.Status;
+import com.unibuc.Home.Management.Platform.domain.User;
 import com.unibuc.Home.Management.Platform.exception.PersonNotFoundException;
 import com.unibuc.Home.Management.Platform.exception.TaskNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Repository;
 
+import java.security.Principal;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+
 @Repository
 public class TaskRepository {
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private JavaMailSender javaMailSender;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PersonRepository personRepository;
 
     public TaskRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -31,13 +46,13 @@ public class TaskRepository {
                 .id(resultSet.getLong("id"))
                 .name(resultSet.getString("name"))
                 .description(resultSet.getString("description"))
-                .priority(resultSet.getString("priority"))
+                .priorityId(resultSet.getLong("priorityId"))
                 .status(Status.valueOf(resultSet.getString("status")))
                 .startDate(resultSet.getDate("startDate"))
                 .endDate(resultSet.getDate("endDate"))
                 .personId(resultSet.getInt("personId"))
                 .build();
-
+        //sendEmail();
         return jdbcTemplate.query(sql, rowMapper);
     }
 
@@ -47,7 +62,7 @@ public class TaskRepository {
             return new Task(resultSet.getLong("id"),
                     resultSet.getString("name"),
                     resultSet.getString("description"),
-                    resultSet.getString("priority"),
+                    resultSet.getLong("priorityId"),
                     Status.valueOf(resultSet.getString("status")),
                     resultSet.getDate("startDate"),
                     resultSet.getDate("endDate"),
@@ -79,11 +94,11 @@ public class TaskRepository {
             preparedStatement.setObject(1, null);
             preparedStatement.setString(2, task.getName());
             preparedStatement.setString(3, task.getDescription());
-            preparedStatement.setString(4, task.getPriority());
+            preparedStatement.setLong(4, task.getPriorityId());
             preparedStatement.setString(5, task.getStatus().toString());
             preparedStatement.setDate(6, (Date) task.getStartDate());
             preparedStatement.setDate(7, (Date) task.getEndDate());
-            preparedStatement.setLong(8, task.getPersonId());
+            preparedStatement.setObject(8, task.getPersonId());
             return preparedStatement;
         };
         GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
@@ -99,7 +114,7 @@ public class TaskRepository {
                 .id(resultSet.getLong("id"))
                 .name(resultSet.getString("name"))
                 .description(resultSet.getString("description"))
-                .priority(resultSet.getString("priority"))
+                .priorityId(resultSet.getLong("priorityId"))
                 .status(Status.valueOf(resultSet.getString("status")))
                 .startDate(resultSet.getDate("startDate"))
                 .endDate(resultSet.getDate("endDate"))
@@ -110,14 +125,33 @@ public class TaskRepository {
             throw new PersonNotFoundException(firstName);
         return listOfTasks;
     }
+    public List<Task> getByTaskName(String nameOfTask) {
 
-    public List<Task> getFreeTasks() {
+        String sql = "select * from tasks t inner join persons p on t.personId = p.Id where" +
+                " t.Name like  ?";
+        RowMapper<Task> rowMapper = (resultSet, rowNo) -> Task.builder()
+                .id(resultSet.getLong("id"))
+                .name(resultSet.getString("name"))
+                .description(resultSet.getString("description"))
+                .priorityId(resultSet.getLong("priorityId"))
+                .status(Status.valueOf(resultSet.getString("status")))
+                .startDate(resultSet.getDate("startDate"))
+                .endDate(resultSet.getDate("endDate"))
+                .personId(resultSet.getInt("personId"))
+                .build();
+        List<Task> listOfTasks = jdbcTemplate.query(sql, rowMapper, nameOfTask);
+        if(listOfTasks.size() == 0)
+            throw new TaskNotFoundException();
+        return listOfTasks;
+    }
+
+    public List<Task> getEmptyTask() {
         String sql = "select * from tasks where personId is null";
         RowMapper<Task> rowMapper = (resultSet, rowNo) -> Task.builder()
                 .id(resultSet.getLong("id"))
                 .name(resultSet.getString("name"))
                 .description(resultSet.getString("description"))
-                .priority(resultSet.getString("priority"))
+                .priorityId(resultSet.getLong("priorityId"))
                 .status(Status.valueOf(resultSet.getString("status")))
                 .startDate(resultSet.getDate("startDate"))
                 .endDate(resultSet.getDate("endDate"))
@@ -150,5 +184,41 @@ public class TaskRepository {
             }
         }
         return false;
+    }
+
+    void sendEmail() {
+
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setTo("cristian.teodorescu97@gmail.com");
+
+        msg.setSubject("Testing from Spring Boot");
+        msg.setText("Hello World \n Spring Boot Email");
+
+
+        javaMailSender.send(msg);
+
+    }
+
+
+    public List<Task> getOwnTasks(Principal principal) {
+        String username = principal.getName();
+        Optional<User> user = userRepository.findByUsername(username);
+        Optional<Person> person = personRepository.getById(user.get().getPersonId());
+        String sql = "select * from tasks t inner join persons p on t.personId = p.Id where" +
+                " p.id=?";
+        RowMapper<Task> rowMapper = (resultSet, rowNo) -> Task.builder()
+                .id(resultSet.getLong("id"))
+                .name(resultSet.getString("name"))
+                .description(resultSet.getString("description"))
+                .priorityId(resultSet.getLong("priorityId"))
+                .status(Status.valueOf(resultSet.getString("status")))
+                .startDate(resultSet.getDate("startDate"))
+                .endDate(resultSet.getDate("endDate"))
+                .personId(resultSet.getInt("personId"))
+                .build();
+        List<Task> listOfTasks = jdbcTemplate.query(sql, rowMapper, person.get().getId());
+        if(listOfTasks.size() == 0)
+            throw new TaskNotFoundException();
+        return listOfTasks;
     }
 }

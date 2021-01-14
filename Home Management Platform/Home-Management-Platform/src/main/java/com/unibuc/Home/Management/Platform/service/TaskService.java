@@ -5,6 +5,7 @@ import com.unibuc.Home.Management.Platform.domain.Task;
 import com.unibuc.Home.Management.Platform.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,11 +46,19 @@ public class TaskService {
         return taskRepository.getTaskByPersonName(nameOfPerson);
     }
 
-    public List<Task> getFreeTasks() {
-        return taskRepository.getFreeTasks();
+    public List<Task> getEmptyTask() {
+        return taskRepository.getEmptyTask();
     }
 
     public void changeTaskStatus(Long taskId, String status, Long personId) {
         taskRepository.changeTaskStatus(taskId,status,personId);
+    }
+
+    public List<Task> getByTaskName(String nameOfTask) {
+        return taskRepository.getByTaskName(nameOfTask);
+    }
+
+    public List<Task> getOwnTasks(Principal principal) {
+        return taskRepository.getOwnTasks(principal);
     }
 }

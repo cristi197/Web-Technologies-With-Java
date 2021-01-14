@@ -37,9 +37,9 @@ public class PersonService {
         return personRepository.getAll();
     }
 
-    public void changeYear(Person person) {
+    public void updatePersonDetails(Person person) {
         personRepository.updatePersonDetails(
-                person.getId(), person.getAge());
+                person.getId(), person.getAge(),person.getFirstName(),person.getLastName());
     }
     public Person createPerson(Person person){
         return personRepository.createPerson(person);
