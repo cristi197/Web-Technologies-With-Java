@@ -1,6 +1,7 @@
 package com.unibuc.demo.controller;
 
 import com.unibuc.demo.domain.Task;
+import com.unibuc.demo.dto.TaskDto;
 import com.unibuc.demo.mapper.TaskMapper;
 import com.unibuc.demo.service.TaskService;
 import org.springframework.http.ResponseEntity;
@@ -57,8 +58,8 @@ public class TaskController {
     }
     @PostMapping
     public ResponseEntity<Task> createTask(
-            @RequestBody Task task) {
-        // Person person = personMapper.personDtoToPerson(personDto);  TO DO
+            @RequestBody TaskDto taskDto) {
+         Task task = TaskMapper.taskDtoToTask(taskDto);  //TO DO
         Task createdTask = taskService.createTask(task);
         return ResponseEntity
                 .created(URI.create("/tasks/" + createdTask.getId()))

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PersonMapper {
-    public Person personDtoToPerson(PersonDto personDto){
+    public static Person personDtoToPerson(PersonDto personDto){
         return new Person(personDto.getFirstName(),personDto.getLastName(),
                 personDto.getAge(),personDto.getRoleId());
     }

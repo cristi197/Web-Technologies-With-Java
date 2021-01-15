@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TaskMapper {
-    public Task taskDtoToTask(TaskDto taskDto){
+    public static Task taskDtoToTask(TaskDto taskDto){
         return new Task(taskDto.getName(),taskDto.getDescription(),taskDto.getPriorityId(),
                 taskDto.getStatus(),taskDto.getStartDate(),taskDto.getEndDate(),taskDto.getPersonId());
     }

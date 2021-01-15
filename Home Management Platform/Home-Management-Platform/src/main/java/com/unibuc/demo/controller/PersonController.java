@@ -1,6 +1,7 @@
 package com.unibuc.demo.controller;
 
 import com.unibuc.demo.domain.Person;
+import com.unibuc.demo.dto.PersonDto;
 import com.unibuc.demo.mapper.PersonMapper;
 import com.unibuc.demo.service.PersonService;
 import org.springframework.http.ResponseEntity;
@@ -37,9 +38,9 @@ public class PersonController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<Person> createBankAccount(
-            @RequestBody Person person) {
-       // Person person = personMapper.personDtoToPerson(personDto);  TO DO
+    public ResponseEntity<Person> createdPerson(
+            @RequestBody PersonDto personDto) {
+        Person person = personMapper.personDtoToPerson(personDto);  //TO DO
         Person createdPerson = personService.createPerson(person);
         return ResponseEntity
                 .created(URI.create("/person/" + createdPerson.getId()))
