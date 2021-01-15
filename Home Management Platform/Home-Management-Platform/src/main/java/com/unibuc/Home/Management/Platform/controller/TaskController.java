@@ -61,7 +61,7 @@ public class TaskController {
         // Person person = personMapper.personDtoToPerson(personDto);  TO DO
         Task createdTask = taskService.createTask(task);
         return ResponseEntity
-                .created(URI.create("/bankAccount/" + createdTask.getId()))
+                .created(URI.create("/tasks/" + createdTask.getId()))
                 .body(createdTask);
     }
 

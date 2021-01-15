@@ -1,12 +1,16 @@
 package com.unibuc.Home.Management.Platform.repository;
 
 import com.unibuc.Home.Management.Platform.domain.Person;
+import com.unibuc.Home.Management.Platform.domain.User;
+import com.unibuc.Home.Management.Platform.exception.PersonNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.security.Principal;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
@@ -14,6 +18,8 @@ import java.util.Optional;
 
 @Repository
 public class PersonRepository {
+    @Autowired
+    private UserRepository userRepository;
 
     private JdbcTemplate jdbcTemplate;
 
@@ -49,7 +55,7 @@ public class PersonRepository {
         return jdbcTemplate.query(sql, rowMapper);
     }
 
-    public void updatePersonDetails(long id, int age, String firstName, String lastName) {
+    public void updatePersonDetailsByAdmin(long id, int age, String firstName, String lastName) {
         String sql = "update person p set p.age = ?,p.firstName = ?, p.lastName = ? where p.id = ?";
         int numberOfUpdatedPersonYear = jdbcTemplate.update(sql, age,firstName ,lastName , id);
         if (numberOfUpdatedPersonYear == 0) {
@@ -79,5 +85,26 @@ public class PersonRepository {
         generatedKeyHolder.getKey();
         person.setId(generatedKeyHolder.getKey().longValue());
         return person;
+    }
+
+    public void updatePersonOwnDetails(Person person, Principal principal) {
+        String username = principal.getName();
+        Optional<User> user = userRepository.findByUsername(username);
+        Optional<Person> person1 = getById(user.get().getPersonId());
+        System.out.println(person.getId());
+        System.out.println(person1.get().getId());
+        if(person.getId() == person1.get().getId())
+        {
+            String sql = "update person p set p.age = ?,p.firstName = ?, p.lastName = ? where p.id = ?";
+
+            int numberOfUpdatedPersonYear = jdbcTemplate.update(sql, person.getAge(),person.getFirstName() ,person.getLastName() , person1.get().getId());
+            if (numberOfUpdatedPersonYear == 0) {
+                throw new RuntimeException();
+            }
+        }
+        else{
+            throw new PersonNotFoundException(person1.get().getId(), person1.get().getFirstName());
+        }
+
     }
 }

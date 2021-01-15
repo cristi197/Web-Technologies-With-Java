@@ -7,4 +7,7 @@ public class PersonNotFoundException extends RuntimeException {
     public PersonNotFoundException(String firstName) {
         super("Person with firstName: " + firstName + " doesn't exist ");
     }
+    public PersonNotFoundException(long id, String firstName){
+        super(firstName + " you cannot change other people details!");
+    }
 }

@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,8 +38,8 @@ public class PersonService {
         return personRepository.getAll();
     }
 
-    public void updatePersonDetails(Person person) {
-        personRepository.updatePersonDetails(
+    public void updatePersonDetailsByAdmin(Person person) {
+        personRepository.updatePersonDetailsByAdmin(
                 person.getId(), person.getAge(),person.getFirstName(),person.getLastName());
     }
     public Person createPerson(Person person){
@@ -47,6 +48,10 @@ public class PersonService {
 
     public void deletePersonById(Long id){
         personRepository.deletePersonById(id);
+    }
+
+    public void updatePersonOwnDetails(Person person, Principal principal) {
+        personRepository.updatePersonOwnDetails(person,principal);
     }
 
  /*   public PersonDto save(PersonDto personDto) {

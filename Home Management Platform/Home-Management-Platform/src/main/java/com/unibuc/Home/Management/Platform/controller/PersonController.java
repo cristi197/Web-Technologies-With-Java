@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 
 
@@ -45,12 +46,19 @@ public class PersonController {
                 .created(URI.create("/person/" + createdPerson.getId()))
                 .body(createdPerson);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping
-    public void updatePersonDetails(
+    public void updatePersonDetailsByAdmin(
             @RequestBody
                     Person person) {
-        personService.updatePersonDetails(person);
+        personService.updatePersonDetailsByAdmin(person);
+    }
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/updateOwnDetails")
+    public void updatePersonOwnDetails(
+            @RequestBody
+                    Person person, Principal principal) {
+        personService.updatePersonOwnDetails(person, principal);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
