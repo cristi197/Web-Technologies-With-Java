@@ -106,7 +106,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     public Person createPerson(Person person){
-        String sql = "insert into persons values (?,?,?,?,?)";
+        String sql = "insert into person values (?,?,?,?,?)";
         PreparedStatementCreator preparedStatementCreator = connection -> {
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setObject(1, null);

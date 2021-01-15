@@ -109,7 +109,7 @@ public class TaskRepository {
     }
 
     public List<Task> getTaskByPersonName(String firstName) {
-        String sql = "select * from tasks t inner join persons p on t.personId = p.Id where p.firstName = ?";
+        String sql = "select * from tasks t inner join person p on t.personId = p.Id where p.firstName = ?";
         RowMapper<Task> rowMapper = (resultSet, rowNo) -> Task.builder()
                 .id(resultSet.getLong("id"))
                 .name(resultSet.getString("name"))
@@ -127,7 +127,7 @@ public class TaskRepository {
     }
     public List<Task> getByTaskName(String nameOfTask) {
 
-        String sql = "select * from tasks t inner join persons p on t.personId = p.Id where" +
+        String sql = "select * from tasks t inner join person p on t.personId = p.Id where" +
                 " t.Name like  ?";
         RowMapper<Task> rowMapper = (resultSet, rowNo) -> Task.builder()
                 .id(resultSet.getLong("id"))
@@ -204,7 +204,7 @@ public class TaskRepository {
         String username = principal.getName();
         Optional<User> user = userRepository.findByUsername(username);
         Optional<Person> person = personRepository.getById(user.get().getPersonId());
-        String sql = "select * from tasks t inner join persons p on t.personId = p.Id where" +
+        String sql = "select * from tasks t inner join person p on t.personId = p.Id where" +
                 " p.id=?";
         RowMapper<Task> rowMapper = (resultSet, rowNo) -> Task.builder()
                 .id(resultSet.getLong("id"))

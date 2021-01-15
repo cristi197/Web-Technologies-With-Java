@@ -31,7 +31,7 @@ public class PersonController {
     }
 
     @GetMapping("/{id}")
-    public Person getBankAccount(@PathVariable Long id) {
+    public Person getById(@PathVariable Long id) {
         return personService.getById(id);
     }
 
@@ -42,7 +42,7 @@ public class PersonController {
        // Person person = personMapper.personDtoToPerson(personDto);  TO DO
         Person createdPerson = personService.createPerson(person);
         return ResponseEntity
-                .created(URI.create("/bankAccount/" + createdPerson.getId()))
+                .created(URI.create("/person/" + createdPerson.getId()))
                 .body(createdPerson);
     }
 
@@ -59,6 +59,8 @@ public class PersonController {
         personService.deletePersonById(id);
     }
 }
+
+
 //    @RequestMapping(value = "/test/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
 //    public String test(@PathVariable("name") String name) {
 //        return "Hello from " + name;

@@ -22,7 +22,7 @@ public class PersonRepository {
     }
 
     public Optional<Person> getById(Long id) {
-        String sql = "SELECT * FROM persons p WHERE p.id = ?";
+        String sql = "SELECT * FROM person p WHERE p.id = ?";
         RowMapper<Person> mapper = (resultSet, rowNum) -> {
             return new Person(resultSet.getLong("id"),
                     resultSet.getString("firstName"),
@@ -37,7 +37,7 @@ public class PersonRepository {
     }
 
     public List<Person> getAll() {
-        String sql = "select * from persons";
+        String sql = "select * from person";
         RowMapper<Person> rowMapper = (resultSet, rowNo) -> Person.builder()
                 .id(resultSet.getLong("id"))
                 .firstName(resultSet.getString("firstName"))
@@ -50,7 +50,7 @@ public class PersonRepository {
     }
 
     public void updatePersonDetails(long id, int age, String firstName, String lastName) {
-        String sql = "update persons p set p.age = ?,p.firstName = ?, p.lastName = ? where p.id = ?";
+        String sql = "update person p set p.age = ?,p.firstName = ?, p.lastName = ? where p.id = ?";
         int numberOfUpdatedPersonYear = jdbcTemplate.update(sql, age,firstName ,lastName , id);
         if (numberOfUpdatedPersonYear == 0) {
             throw new RuntimeException();
@@ -58,12 +58,12 @@ public class PersonRepository {
     }
 
     public void deletePersonById(Long id){
-        String sql="delete from persons  where  id = ?";
+        String sql="delete from person  where  id = ?";
         jdbcTemplate.update(sql,id);
     }
 
     public Person createPerson(Person person) {
-        String sql = "insert into persons values (?,?,?,?,?)";
+        String sql = "insert into person values (?,?,?,?,?)";
         PreparedStatementCreator preparedStatementCreator = connection -> {
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setObject(1, null);
@@ -79,53 +79,5 @@ public class PersonRepository {
         generatedKeyHolder.getKey();
         person.setId(generatedKeyHolder.getKey().longValue());
         return person;
-/*        String sql="insert into bankaccounts values (?,?,?,?,?)";
-        jdbcTemplate.update(sql,null, bankAccount.getAccountNumber(),
-                bankAccount.getBalance(),bankAccount.getType().toString(),bankAccount.getCardNumber());*/
     }
-    /*    public PersonRepository() {
-        loadData();
-    }*/
-
-/*    public Person save(Person person) {
-        persons.add(person);
-        return person;
-    }
-
-    public Person update(Person person) {
-        Optional<Person> optionalPerson = persons.stream()
-                .filter(person1 -> person1.getFirstName().equals(person.getFirstName()))
-                .findAny();
-        if (optionalPerson.isPresent()) {
-            persons.remove(optionalPerson.get());
-            persons.add(person);
-            return person;
-        }
-        return null;
-    }
-
-    public List<Person> getAll() {
-        return persons;
-    }
-
-    public void delete(Person person) {
-        persons.remove(person);
-    }
-
-    private void loadData() {
-        Person person1 = Person.builder()
-                .firstName("Cristian")
-                .lastName("Teodorescu")
-                .age(23)
-                .build();
-        persons.add(person1);
-        Person person2 = Person.builder()
-                .firstName("Andrei")
-                .lastName("Ionescu")
-                .age(14)
-                .build();
-        persons.add(person2);
-    }*/
-
-
 }

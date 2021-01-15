@@ -24,9 +24,9 @@ public class PersonService {
     }
 
     public Person getById(Long id) {
-        Optional<Person> bankAccountOptional = personRepository.getById(id);
-        if(bankAccountOptional.isPresent()) {
-            return bankAccountOptional.get();
+        Optional<Person> personOptional = personRepository.getById(id);
+        if(personOptional.isPresent()) {
+            return personOptional.get();
         } else {
             throw new RuntimeException();
         }
