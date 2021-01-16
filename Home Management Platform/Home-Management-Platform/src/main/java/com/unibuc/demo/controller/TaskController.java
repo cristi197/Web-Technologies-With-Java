@@ -68,7 +68,7 @@ public class TaskController {
 
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}/{personId}")
-    public void changePersonId(@PathVariable("id") Long id,@PathVariable("personId") Long personId) {
+    public void changePersonIdForTaskId(@PathVariable("id") Long id,@PathVariable("personId") Long personId) {
         taskService.changePersonId(id, personId);
     }
 

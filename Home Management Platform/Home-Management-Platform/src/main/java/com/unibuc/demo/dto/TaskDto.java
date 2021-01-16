@@ -23,7 +23,7 @@ public class TaskDto {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
 //    @Min(value = 0, message = "Person id must be positive")
-    private long personId;
+    private Long personId;
 
     public TaskDto() {
     }
